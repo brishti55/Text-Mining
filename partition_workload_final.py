@@ -9,18 +9,18 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
 def main():
-    print "Begin..."
+    #print "Begin..."
 
     data_dir = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/abstract_file_list/"
     output_dir1 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/parsed_abstracts/"
     output_dir2 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/abstract_sentences/"
 
 
-    year = ["1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003"]
-    #year = ["1990"]
+#     year = ["1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003"]
+    year = ["1998", "1999", "2000", "2001", "2002", "2003"]
 
     #cnt = 0
-    line_distribution = [0 for i in range(100)]
+    line_distribution = [0 for i in range(250)]
     #print line_distribution
     for y in year:
       award_dir = "awards_" + y
@@ -107,14 +107,14 @@ def main():
 
           output_file.close()
           parsed_file.close()
-          print "End Tokenization of the file."
+          #print "End Tokenization of the file."
 
     #print line_distribution 
     line_dist_file = open(data_dir + "../line_distribution.txt", "w")
     for i in range(0,len(line_distribution)):
         line_dist_file.write(str(i) + " " + str(line_distribution[i]) + "\n")
     #abstract_file_list.close()
-    print "End Abstract parsing and tokenization."
+    #print "End Abstract parsing and tokenization."
       
             
 #     print "Begin..."
