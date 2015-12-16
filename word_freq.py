@@ -9,165 +9,126 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
 def main():
+#     print "Begin..."
+
+    data_dir1 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/abstract_sentences/"
+    data_dir2 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/parsed_abstracts/"
+    output_dir1 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/abstract_words/"
+    output_dir2 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/funding_agency/"
+
+
     print "Begin..."
+    vocabDict={}
+    DocCount = 0
+    for filename in glob.glob(data_dir1 + '*.txt'):
+        print filename
+        DocCount += 1
+        parsed_file = open(filename, 'r')
+        ofn = filename.split("/")
+        output_file_name = ofn[len(ofn) - 1]
+        output_file = open(output_dir1 + output_file_name , 'w')
 
-    data_dir = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/test/abstract_sentences/"
-    output_dir = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/test/abstract_words/"
+        # Generate list of English stopwords
+        english_stops = set(stopwords.words('english'))
 
+        # Punctuation set
+        punct = ''.join(set(string.punctuation))
 
-#     year = ["1990", "1991", "1992", "1993", "1994"]
-#     #year = ["1990"]
-# 
-#     #cnt = 0
-#     line_distribution = [0 for i in range(100)]
-#     #print line_distribution
-#     for y in year:
-#       award_dir = "awards_" + y
-#       award_folder_prefix = "awd_" + y + "_"
-# 
-#       for id in range (0, 97):
-#       #for id in range (0, 1):
-#         #cnt = cnt + 1 
-#         #if cnt == 10:
-#         #   break
-#         award_folder_index = "%02d" %id
-#         file_format = ".txt"
-# 
-#         #print award_folder_index
-# 
-#         filepath = data_dir + award_dir + "/" + award_folder_prefix + award_folder_index + "/"
-# 
-#         #print folder_name
-# 
-#        # filepath = 'abstract_list.txt'
-#         for filename in glob.glob(filepath + '*.txt'):
-#           abstract = open(filename, 'r')
-#           out_name = filename.replace("/","_")
-#           #print out_name
-#           #print abstract
-#           output_file = open(output_dir1 + out_name + '_parsed_abstracts.txt', 'w')
-#       #
-#       #     for abstract_filename in abstract_file_list:
-#       #         print abstract_filename.rstrip()
-#       #         abstract = open(abstract_filename.rstrip(), 'r')
-#   
-#           abstract_record = []
-#           abstract_text = ''
-#           
-#           for line in abstract:
-#             line = line.rstrip()
-#             line = line.split(':')
-#             if line[0] == 'NSF Org     ' or line[0] == 'Award Number':
-#                 abstract_record.append(line[1].strip())
-#     
-#             if line[0] == 'Abstract    ':
-#                 for line in abstract:
-#                     abstract_text = abstract_text + line.rstrip()
-#                 abstract_text = ' '.join(abstract_text.split())
-#                 abstract_record.append(abstract_text)
-#                 #print abstract_text
-#                 break
-#   
-#           output_file.write('<>'.join(abstract_record)+'\n')
-#   
-#   
-#           abstract.close()
-#   
-#           output_file.close()
-#      
-#           #parsed_file = open('parsed_abstracts.txt', 'r')
-#           parsed_file = open(output_dir1 + out_name + '_parsed_abstracts.txt', 'r')
-#           fi = output_dir1 + out_name + '_parsed_abstracts.txt'
-#           print "Begin Tokenization... on " + fi  
-#           output_file = open(output_dir2 + out_name + '_abstract_sentences.txt', 'w')
-#           fo = output_dir2 + out_name + '_abstract_sentences.txt'
-#      
-#           tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-#      
-#           for line in parsed_file:
-#               if line.isspace():
-#                   continue
-#               else:
-#                   if len(line.split('<>')) <= 3:
-#                       (nsf_agency, award_number, abstract) = line.split('<>')
-#      
-#               if abstract.isspace():
-#                   continue
-#               else:
-#                   # Remove non-ASCII characters
-#                   abstract = ''.join([i if ord(i) < 128 else '' for i in abstract])
-#      
-#                   # Tokenize sentences
-#                   sentences = tokenizer.tokenize(abstract.rstrip())
-#      
-#                   if '***' in sentences[-1]:   # Error check
-#                       sentences.pop()
-#                   
-#                   sent_cnt = 0
-#                   for sentence in sentences:
-#                       sent_cnt += 1
-#                       print "saving abstract sentences to " + fo 
-#                       output_file.write(str(award_number)+'|'+str(sentences.index(sentence)+1)+'|'+sentence+'\n')
-#                   line_distribution[sent_cnt] += 1
-# 
-#           output_file.close()
-#           parsed_file.close()
-#           print "End Tokenization of the file."
-# 
-#     #print line_distribution 
-#     line_dist_file = open(data_dir + "../line_distribution.txt", "w")
-#     for i in range(0,len(line_distribution)):
-#         line_dist_file.write(str(i) + " " + str(line_distribution[i]) + "\n")
-#     #abstract_file_list.close()
-#     print "End Abstract parsing and tokenization."
-      
-            
-    print "Begin..."
+        # Initialize stemmer
+        porter = PorterStemmer()
+        
+        vocabulary = []
+        for line in parsed_file:
+            if line.isspace():
+                continue
+            else:
+                if len(line.split('|')) <= 3:
+                    (abstract_id, sentence_id, sentence) = line.split('|')
+
+            if sentence.isspace():
+                continue
+            else:
+                words = word_tokenize(sentence.rstrip())
+
+                # Remove words that are just punctuation
+                words = filter(lambda word: word not in punct, words)
+
+                # Normalize the words
+                words = [word.lower() for word in words]
+
+                # Remove stopwords
+                words = [word for word in words if word not in english_stops]
+
+                # Apply the Porter stemmer
+                words = [porter.stem(word) for word in words]
+                
+                for word in words:
+                    vocabulary.append(word)
+                    output_file.write(str(abstract_id)+','+str(sentence_id)+','+str(words.index(word))+','+word+'\n')
+        vocabulary = set(vocabulary)
+        for word in vocabulary:
+            if (word in vocabDict):
+                vocabDict[word] += 1
+            else:
+                vocabDict[word] = 1    
+                   
+    #org name and award number table
+    for file_name in glob.glob(data_dir2 + '*.txt'):
+                parsed_abstract = open(file_name, 'r')
+                output_file1 = open(output_dir2 + 'agency.txt', 'a')
+                  
+                for line in parsed_abstract:
+                    if line.isspace():
+                        continue
+                    else:
+                        if len(line.split('<>')) <= 3:
+                            (nsf_agency, award_number, abstract) = line.split('<>')
+                              
+                output_file1.write(str(award_number)+','+str(nsf_agency) + '\n')
+                output_file1.close()
+                parsed_abstract.close()              
+                      
     
-    file_name = data_dir + '*txt'
-    parsed_file = open('file_name', 'r')
-    print parsed_file
-    output_file = open('abstract_words.csv', 'w')
-
-    # Generate list of English stopwords
-    english_stops = set(stopwords.words('english'))
-
-    # Punctuation set
-    punct = ''.join(set(string.punctuation))
-
-    # Initialize stemmer
-    porter = PorterStemmer()
-
-    for line in parsed_file:
-        if line.isspace():
-            continue
-        else:
-            if len(line.split('^')) <= 3:
-                (abstract_id, sentence_id, sentence) = line.split('^')
-
-        if sentence.isspace():
-            continue
-        else:
-            words = word_tokenize(sentence.rstrip())
-
-            # Remove words that are just punctuation
-            words = filter(lambda word: word not in punct, words)
-
-            # Normalize the words
-            words = [word.lower() for word in words]
-
-            # Remove stopwords
-            words = [word for word in words if word not in english_stops]
-
-            # Apply the Porter stemmer
-            words = [porter.stem(word) for word in words]
-
-            for word in words:
-                output_file.write(str(abstract_id)+'|'+str(sentence_id)+'|'+str(words.index(word))+'|'+word+'\n')
-
+    
     output_file.close()
     parsed_file.close()
     print "End..."
+    
+#     print vocabulary
+#     vocabulary = sorted(vocabulary)
+#     #vocabulary = list(set(list(vocabulary)))
+#     
+#     from nltk import FreqDist
+#     vocabDist = FreqDist(vocabulary)
+#     for word in set(vocabulary):
+#         print word, "=", vocabDist[word]
+
+    print "Total Document = " , DocCount    
+    highFreqVocab = {}
+    for word in vocabDict:
+        print word, "=", vocabDict[word]
+        presence = vocabDict[word]
+        if (presence > 5 and presence < 95 and 
+            not word.isdigit() and word !="'s" 
+            and word != "''" and word != "``"):
+            highFreqVocab[word] = presence
+    
+    output_dir3 = "/Users/Brishti/Documents/spring2015_classes/text_mining/python-codes/python-output/"
+    
+    sortedHighFreqWords=[]
+    for word in highFreqVocab:
+        sortedHighFreqWords.append(word)
+    
+    sortedHighFreqWords = sorted(sortedHighFreqWords)
+    
+    highFreqVocabFile = open(output_dir3 + "highFreqVocab.txt","w")
+    for word in sortedHighFreqWords:
+        tmpStr = word+ " " + str(highFreqVocab[word]) + "\n"
+        print tmpStr
+        highFreqVocabFile.write(tmpStr)
+    
+        
+    
 
 if __name__ == "__main__":
     main()

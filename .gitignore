@@ -1,0 +1,17 @@
+.pydevproject
+AFINN.zip
+AFINN/
+abstract_words.txt
+Health.txt
+Health_copy.txt
+health_output.txt
+health_output_test.txt
+health_review_sentence.txt
+health_review_sentence_test.txt
+abstract_words.csv
+line_distribution.txt
+posnegterm_frequency.txt
+review_words_new/
+sentPolarity.csv
+sentPolarity.xlsx
+top3_sent/
